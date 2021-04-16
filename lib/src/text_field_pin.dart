@@ -20,10 +20,10 @@ class TextFieldPin extends StatefulWidget {
   TextFieldPin(
       {Key key,
       this.onOtpCallback,
-      this.boxSize = 46,
+      this.boxSize = 64,
       this.borderStyle,
       this.filled = false,
-      this.filledColor = Colors.grey,
+      this.filledColor = Colors.blue,
       this.codeLength = 5,
       this.textStyle,
       this.margin = 16,
@@ -69,7 +69,7 @@ class _TextFieldPinState extends State<TextFieldPin> {
     _startListeningOtpCode();
     if (widget.borderStyeAfterTextChange == null) {
       _borderAfterTextChange = OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey, width: 1));
     } else {
       _borderAfterTextChange = widget.borderStyeAfterTextChange;
@@ -151,60 +151,64 @@ class _TextFieldPinState extends State<TextFieldPin> {
 
     if (_border == null) {
       _border = OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
           color: Colors.grey,
-          width: 1.0,
         ),
       );
     }
+    List<Widget> pins = List<Widget>.generate(
+        mListOtpData.length, (int index) => _singlePinView(index)).toList();
+    return Container(
+      child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: pins),
+    );
 
     return Container(
-      height: widget.boxSize,
       width: MediaQuery.of(context).size.width,
-      child: Center(
-        child: ListView.builder(
-            itemCount: mListOtpData.length,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            itemBuilder: (context, i) {
-              return Container(
-                width: widget.boxSize,
-                height: widget.boxSize,
-                margin: EdgeInsets.only(
-                    right: i != mListOtpData.length - 1 ? widget.margin : 0),
-                child: Center(
-                  child: textFieldFill(
-                    focusNode: focusNode[i],
-                    textEditingController: textController[i],
-                    border: _getBorder(i),
-                    isFilled: _isFilled(i),
-                    onTextChange: (value) {
-                      _otpNumberCallback(i, false);
+      height: widget.boxSize,
+      child: ListView.builder(
+          itemCount: mListOtpData.length,
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemBuilder: (context, i) {
+            return Container(
+              width: widget.boxSize,
+              height: widget.boxSize * 4,
+              margin: EdgeInsets.only(
+                  right: i != mListOtpData.length - 1 ? widget.margin : 0),
+              child: Center(
+                child: textFieldFill(
+                  focusNode: focusNode[i],
+                  textEditingController: textController[i],
+                  border: _getBorder(i),
+                  isFilled: _isFilled(i),
+                  onTextChange: (value) {
+                    _otpNumberCallback(i, false);
 
-                      if (value.toString().length > 0) {
-                        if (_nextFocus != mListOtpData.length) {
-                          _nextFocus = i + 1;
-                          FocusScope.of(context)
-                              .requestFocus(focusNode[_nextFocus]);
-                        } else {
-                          _nextFocus = (mListOtpData.length-1) - 1;
-                        }
+                    if (value.toString().length > 0) {
+                      if (_nextFocus != mListOtpData.length) {
+                        _nextFocus = i + 1;
+                        FocusScope.of(context)
+                            .requestFocus(focusNode[_nextFocus]);
                       } else {
-                        if (i >= 1) {
-                          _nextFocus = i - 1;
-                          FocusScope.of(context)
-                              .requestFocus(focusNode[_nextFocus]);
-                        } else {
-                          _nextFocus = 1;
-                        }
+                        _nextFocus = (mListOtpData.length - 1) - 1;
                       }
-                    },
-                  ),
+                    } else {
+                      if (i >= 1) {
+                        _nextFocus = i - 1;
+                        FocusScope.of(context)
+                            .requestFocus(focusNode[_nextFocus]);
+                      } else {
+                        _nextFocus = 1;
+                      }
+                    }
+                  },
                 ),
-              );
-            }),
-      ),
+              ),
+            );
+          }),
     );
   }
 
@@ -251,6 +255,47 @@ class _TextFieldPinState extends State<TextFieldPin> {
             WhitelistingTextInputFormatter.digitsOnly
           ]),
     );
+  }
+
+  _singlePinView(int i) {
+    return Flexible(
+        flex: 3,
+        child: Container(
+          margin: EdgeInsets.all(4),
+          child: Center(
+            child: textFieldFill(
+              focusNode: focusNode[i],
+              textEditingController: textController[i],
+              border: _getBorder(i),
+              isFilled: _isFilled(i),
+              onTextChange: (value) {
+                _otpNumberCallback(i, false);
+
+                if (value.toString().length > 0) {
+                  if (_nextFocus != mListOtpData.length) {
+                    _nextFocus = i + 1;
+
+                    if (_nextFocus == mListOtpData.length) {
+                      FocusScope.of(context).unfocus();
+                    } else {
+                      FocusScope.of(context)
+                          .requestFocus(focusNode[_nextFocus]);
+                    }
+                  } else {
+                    _nextFocus = (mListOtpData.length - 1) - 1;
+                  }
+                } else {
+                  if (i >= 1) {
+                    _nextFocus = i - 1;
+                    FocusScope.of(context).requestFocus(focusNode[_nextFocus]);
+                  } else {
+                    _nextFocus = 1;
+                  }
+                }
+              },
+            ),
+          ),
+        ));
   }
 }
 

@@ -10,7 +10,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int _otpCodeLength = 4;
+  int _otpCodeLength = 5;
   bool _isLoadingButton = false;
   bool _enableButton = false;
   String _otpCode = "";
@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -81,14 +81,14 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 TextFieldPin(
                   filled: true,
-                  filledColor: Colors.grey,
+                  filledColor: Colors.white,
                   codeLength: _otpCodeLength,
                   boxSize: 46,
                   filledAfterTextChange: false,
-                  textStyle: TextStyle(fontSize: 16),
+                  textStyle: TextStyle(fontSize: 32),
                   borderStyle: OutlineInputBorder(
                       borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(34)),
+                      borderRadius: BorderRadius.circular(12)),
                   onOtpCallback: (code, isAutofill) =>
                       _onOtpCallBack(code, isAutofill),
                 ),
